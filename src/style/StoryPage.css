@@ -1,0 +1,46 @@
+.story-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+}
+
+.option-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.story-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding:10px;
+    border: 1px solid hsl(205, 27%, 68%);
+    border-radius: 20px;
+}
+
+.story-button {
+  background-color: hsl(205, 27%, 68%);
+  border: none;
+  border-radius: 100vmax;
+  font-size: 16px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.story-button:active {
+  background-color: hsl(42, 5%, 36%);
+  color: white;
+  border-radius: 100vmax;
+}
+
+.distance-text {
+padding-top: 20px;;
+}
+
