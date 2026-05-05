@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { mainStory } from "./data/mainStory";
+import { useGeolocation } from "./hooks/useGeolocation";
+import { distanceInMeters } from "./utils/geo";
 import LandingPage from "./components/LandingPage";
 import OnboardingPage from "./components/OnboardingPage";
 import CountryPage from "./components/CountryPage";
@@ -8,9 +10,18 @@ import NavigationPage from "./components/NavigationPage";
 import VictoryPage from "./components/VictoryPage";
 import RecapPage from "./components/RecapPage";
 import CountryTransitionPage from "./components/CountryTransitionPage";
+import GpsPermissionPage from "./components/GpsPermissionPage";
 import Navbar from "./components/Navbar";
 
 const STORAGE_KEY = "valnerina-progress-v2";
+const COUNTRY_RADIUS_METERS = 500;
+const POI_RADIUS_METERS = 20;
+
+const countryDefs = [
+  { id: "torreorsina", name: "Torreorsina", lat: 42.553966611469676, lng: 12.642368351609813 },
+  { id: "collestatte", name: "Collestatte", lat: 42.55, lng: 12.665 },
+  { id: "sanliberatore", name: "San Liberatore", lat: 42.556, lng: 12.671 },
+];
 
 const defaultState = {
   screen: "landing",
@@ -23,6 +34,7 @@ const defaultState = {
   feedback: "",
   completedSteps: [],
   completedCountryIds: [],
+  gpsEnabled: false,
 };
 
 function App() {
@@ -61,13 +73,18 @@ function App() {
     feedback,
     completedSteps,
     completedCountryIds,
+    gpsEnabled,
   } = appState;
 
-  const countries = [
-    { id: "torreorsina", name: "Torreorsina", enabled: true },
-    { id: "collestatte", name: "Collestatte", enabled: true },
-    { id: "sanliberatore", name: "San Liberatore", enabled: true },
-  ];
+  const { position: userPosition, error: gpsError, loading: gpsLoading } = useGeolocation(gpsEnabled);
+
+  const countries = countryDefs.map((country) => {
+    if (gpsLoading || gpsError || !userPosition) {
+      return { ...country, enabled: false };
+    }
+    const dist = distanceInMeters(userPosition.lat, userPosition.lng, country.lat, country.lng);
+    return { ...country, enabled: dist <= COUNTRY_RADIUS_METERS };
+  });
 
   const countryNames = {
     torreorsina: "Torreorsina",
@@ -101,6 +118,20 @@ function App() {
     }
   }, [appState]);
 
+  useEffect(() => {
+    if (screen !== "navigation") return;
+    if (riddleUnlocked || !selectedOption || !userPosition) return;
+    const dist = distanceInMeters(
+      userPosition.lat,
+      userPosition.lng,
+      selectedOption.targetLat,
+      selectedOption.targetLng
+    );
+    if (dist <= POI_RADIUS_METERS) {
+      setAppState((prev) => ({ ...prev, riddleUnlocked: true }));
+    }
+  }, [userPosition, screen, riddleUnlocked, selectedOption]);
+
   function updateState(newValues) {
     setAppState((prev) => ({
       ...prev,
@@ -114,6 +145,14 @@ function App() {
 
   function handleContinue() {
     if (!name.trim()) return;
+    updateState({ screen: "gpsPermission" });
+  }
+
+  function handleGrantGps() {
+    updateState({ gpsEnabled: true, screen: "country" });
+  }
+
+  function handleSkipGps() {
     updateState({ screen: "country" });
   }
 
@@ -286,10 +325,21 @@ function App() {
     );
   }
 
+  if (screen === "gpsPermission") {
+    content = (
+      <GpsPermissionPage
+        onGrant={handleGrantGps}
+        onSkip={handleSkipGps}
+      />
+    );
+  }
+
   if (screen === "country") {
     content = (
       <CountryPage
         countries={countries}
+        gpsLoading={gpsLoading}
+        gpsError={gpsError}
         onSelectCountry={handleSelectCountry}
       />
     );
@@ -322,6 +372,9 @@ function App() {
         onSubmitAnswer={handleSubmitAnswer}
         onShowHint={handleShowHint}
         onBackToStory={handleBackToStory}
+        userPosition={userPosition}
+        gpsLoading={gpsLoading}
+        gpsError={gpsError}
       />
     );
   }

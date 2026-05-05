@@ -1,0 +1,61 @@
+.gps-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.gps-icon {
+  font-size: 48px;
+}
+
+.gps-description {
+  color: hsl(42, 5%, 36%);
+  font-size: 15px;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.gps-button {
+  background-color: hsl(205, 27%, 68%);
+  border: none;
+  border-radius: 100vmax;
+  font-size: 16px;
+  padding: 12px 28px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.gps-button:active {
+  background-color: hsl(42, 5%, 36%);
+  color: white;
+}
+
+.gps-skip {
+  background: none;
+  border: none;
+  color: gray;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.gps-status {
+  font-size: 14px;
+  max-width: 320px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.gps-status--ok {
+  color: hsl(140, 40%, 35%);
+}
+
+.gps-status--error {
+  color: hsl(0, 50%, 45%);
+}

@@ -1,3 +1,5 @@
+import { distanceInMeters } from "../utils/geo";
+
 function NavigationPage({
   selectedOption,
   riddleUnlocked,
@@ -8,6 +10,9 @@ function NavigationPage({
   onSubmitAnswer,
   onShowHint,
   onBackToStory,
+  userPosition,
+  gpsLoading,
+  gpsError,
 }) {
   if (!selectedOption) {
     return (
@@ -19,6 +24,20 @@ function NavigationPage({
     );
   }
 
+  const distanceToTarget =
+    userPosition && selectedOption
+      ? Math.round(
+          distanceInMeters(
+            userPosition.lat,
+            userPosition.lng,
+            selectedOption.targetLat,
+            selectedOption.targetLng
+          )
+        )
+      : null;
+
+  const gpsAvailable = !gpsLoading && !gpsError && userPosition;
+
   return (
     <div style={{ padding: "40px" }}>
       <h2>Navigazione</h2>
@@ -26,9 +45,24 @@ function NavigationPage({
       <p>{selectedOption.navigationText}</p>
 
       {!riddleUnlocked && (
-        <button onClick={onUnlockRiddle}>
-          Sono arrivato
-        </button>
+        <div>
+          {gpsLoading && <p>Sto cercando la tua posizione...</p>}
+
+          {gpsAvailable && (
+            <p>
+              {distanceToTarget !== null
+                ? `Sei a ${distanceToTarget} metri dal punto`
+                : "Calcolo distanza..."}
+            </p>
+          )}
+
+          {(gpsError || (!gpsLoading && !userPosition)) && (
+            <div>
+              <p>GPS non disponibile.</p>
+              <button onClick={onUnlockRiddle}>Sono arrivato</button>
+            </div>
+          )}
+        </div>
       )}
 
       {riddleUnlocked && (
@@ -49,29 +83,20 @@ function NavigationPage({
           <br />
           <br />
 
-          <button onClick={onSubmitAnswer}>
-            Conferma risposta
-          </button>
+          <button onClick={onSubmitAnswer}>Conferma risposta</button>
 
-          <button
-            onClick={onShowHint}
-            style={{ marginLeft: "12px" }}
-          >
+          <button onClick={onShowHint} style={{ marginLeft: "12px" }}>
             Mostra indizio
           </button>
 
           {feedback && (
-            <p style={{ marginTop: "16px" }}>
-              {feedback}
-            </p>
+            <p style={{ marginTop: "16px" }}>{feedback}</p>
           )}
         </div>
       )}
 
       <div style={{ marginTop: "24px" }}>
-        <button onClick={onBackToStory}>
-          Torna alla storia
-        </button>
+        <button onClick={onBackToStory}>Torna alla storia</button>
       </div>
     </div>
   );
