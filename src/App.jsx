@@ -356,6 +356,7 @@ function App() {
         selectedCountryId={selectedCountryId}
         currentChapter={currentChapter}
         onSelectOption={handleSelectOption}
+        userPosition={userPosition}
       />
     );
   }

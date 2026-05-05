@@ -1,3 +1,4 @@
+import { distanceInMeters } from "../utils/geo";
 import "../style/StoryPage.css";
 
 function StoryPage({
@@ -5,36 +6,42 @@ function StoryPage({
   selectedCountryId,
   currentChapter,
   onSelectOption,
+  userPosition,
 }) {
   return (
     <div className="story-container">
-      {/*
-      <p>
-        <strong>Giocatore:</strong> {name}
-      </p>
-
-      <p>
-        <strong>Paese:</strong> {selectedCountryId}
-      </p>
-*/}
       <h2>{currentChapter.id}</h2>
       <p>{currentChapter.storyText}</p>
 
       <div className="option-container">
-        {currentChapter.options?.map((option) => (
-          <div key={option.id} className="story-option">
-            <button
-              className="story-button"
-              onClick={() => onSelectOption(option.id)}
-            >
-              {option.buttonText}
-            </button>
+        {currentChapter.options?.map((option) => {
+          const distance =
+            userPosition
+              ? Math.round(
+                  distanceInMeters(
+                    userPosition.lat,
+                    userPosition.lng,
+                    option.targetLat,
+                    option.targetLng
+                  )
+                )
+              : null;
 
-            <p className="distance-text">
-              {option.distance || "--"} metri da te
-            </p>
-          </div>
-        ))}
+          return (
+            <div key={option.id} className="story-option">
+              <button
+                className="story-button"
+                onClick={() => onSelectOption(option.id)}
+              >
+                {option.buttonText}
+              </button>
+
+              <p className="distance-text">
+                {distance !== null ? `${distance} metri da te` : "-- metri da te"}
+              </p>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
