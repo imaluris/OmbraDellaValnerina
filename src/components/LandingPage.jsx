@@ -1,10 +1,11 @@
 import '../style/LandingPage.css'
+import logo from '../assets/logo_invalnerina.svg'
 
 function LandingPage({ onStart }) {
   return (
     <div className='landing-container'>
       <img
-        src="src/assets/logo_invalnerina.svg"
+        src={logo}
         alt="L'ombra della Valnerina"
       />
 
