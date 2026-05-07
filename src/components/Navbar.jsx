@@ -6,7 +6,7 @@ function Navbar() {
   return (
     <nav className="navbar">
       <ToolsIcon />
-      <img src={logo} alt="Logo" style={{ height: "32px"}} />
+      <img src={logo} alt="Logo" style={{ height: "32px", width: "auto", maxWidth: "100px" }} />
     </nav>
   );
 }
