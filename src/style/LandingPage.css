@@ -6,7 +6,7 @@
   align-items: center;
 }
 
-img {
+.landing-container img {
   width: 120px;
   height: auto;
   margin-bottom: 24px;
